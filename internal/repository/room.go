@@ -10,24 +10,20 @@ import (
 var (
 	predefinedRooms = roomStorage{
 		"redisson_blackhole": model.Room{
-			HotelID:  "redisson",
-			RoomID:   "blackhole",
-			Capacity: 2,
+			HotelID: "redisson",
+			RoomID:  "blackhole",
 		},
 		"redisson_morningstart": model.Room{
-			HotelID:  "redisson",
-			RoomID:   "morningstart",
-			Capacity: 4,
+			HotelID: "redisson",
+			RoomID:  "morningstart",
 		},
 		"ritz_italy": model.Room{
-			HotelID:  "ritz",
-			RoomID:   "italy",
-			Capacity: 2,
+			HotelID: "ritz",
+			RoomID:  "italy",
 		},
 		"ritz_spain": model.Room{
-			HotelID:  "ritz",
-			RoomID:   "spain",
-			Capacity: 3,
+			HotelID: "ritz",
+			RoomID:  "spain",
 		},
 	}
 

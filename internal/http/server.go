@@ -29,7 +29,6 @@ type Server struct {
 }
 
 func NewServer(cfg Config, r http.Handler) *Server {
-
 	srv := &http.Server{
 		Addr:    net.JoinHostPort(cfg.Host, strconv.Itoa(cfg.Port)),
 		Handler: r,
@@ -42,10 +41,12 @@ func NewServer(cfg Config, r http.Handler) *Server {
 }
 
 func (s *Server) ListenAndServe(ctx context.Context) error {
+	// TODO make logger for context
 	sCtx, cancelCause := context.WithCancelCause(ctx)
 	defer cancelCause(nil)
 
 	go func() {
+		fmt.Printf("starting http server at %s\n", s.srv.Addr)
 		if err := s.srv.ListenAndServe(); err != nil {
 			cancelCause(err)
 		}

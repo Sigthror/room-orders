@@ -8,27 +8,20 @@ import (
 )
 
 type orderHandlers interface {
-	Get(w http.ResponseWriter, r *http.Request)
-	Create(w http.ResponseWriter, r *http.Request)
-	Update(w http.ResponseWriter, r *http.Request)
-	Delete(w http.ResponseWriter, r *http.Request)
+	Create(w http.ResponseWriter, r *http.Request) error
 }
 
 func NewRouter(
 	oh orderHandlers,
-	hFunc http.HandlerFunc,
 ) http.Handler {
 	r := chi.NewRouter()
 
-	r.Get("/health", hFunc)
+	r.Get("/health", healthHandler)
 	r.Route("/api", func(r chi.Router) {
 		r.Use(middleware.Logger)
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/order", func(r chi.Router) {
-				r.Get("/", oh.Get)
-				r.Post("/", oh.Create)
-				r.Put("/", oh.Update)
-				r.Delete("/", oh.Delete)
+				r.Post("/", newEndpoint(oh.Create))
 			})
 		})
 	})

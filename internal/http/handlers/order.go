@@ -1,28 +1,47 @@
 package handlers
 
 import (
-	"fmt"
+	"encoding/json"
+	"errors"
 	"net/http"
+	httpserver "top-selection-test/internal/http"
+	"top-selection-test/internal/model"
 )
 
-type Order struct{}
-
-func NewOrder() *Order {
-	return &Order{}
+// Usually we don't use repository direct in the handlers,
+// but in current implementation abstraction between transport and DAL is not neccessary
+type OrderRepository interface {
+	Create(order model.Order) error
 }
 
-func (o *Order) Get(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("not implemented") // TODO: Implement
+type Orders struct {
+	orderRepository OrderRepository
 }
 
-func (o *Order) Create(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("not implemented") // TODO: Implement
+func NewOrders(os OrderRepository) *Orders {
+	return &Orders{
+		orderRepository: os,
+	}
 }
 
-func (o *Order) Update(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("not implemented") // TODO: Implement
-}
+func (h *Orders) Create(w http.ResponseWriter, r *http.Request) error {
+	var o model.Order
+	d := json.NewDecoder(r.Body)
+	d.DisallowUnknownFields()
+	if err := d.Decode(&o); err != nil {
+		return httpserver.ResponseError{
+			Code:          http.StatusBadRequest,
+			ResponseError: errors.New("invalid json format"),
+		}
+	}
 
-func (o *Order) Delete(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("not implemented") // TODO: Implement
+	if err := h.orderRepository.Create(o); err != nil {
+		return httpserver.ResponseError{
+			Code:          http.StatusConflict,
+			ResponseError: errors.New("room is not avaliable"),
+			VerboseErr:    err,
+		}
+	}
+
+	return nil
 }

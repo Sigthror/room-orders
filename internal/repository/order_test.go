@@ -109,7 +109,7 @@ func TestOrders_Add(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := orders.Add(tt.order); !errors.Is(err, tt.err) {
+			if err := orders.Create(tt.order); !errors.Is(err, tt.err) {
 				t.Fatalf("%s failed: want '%s' got '%s'", tt.name, tt.err, err)
 			}
 		})
@@ -122,10 +122,6 @@ func TestOrders_Add(t *testing.T) {
 	}
 
 	if !slices.IsSortedFunc(resOrders, func(a, b model.Order) int {
-		if a.From == b.From && a.To == b.To {
-			return 0
-		}
-
 		return a.From.Compare(b.From)
 	}) {
 		t.Fatalf("order's slice is not sorted")

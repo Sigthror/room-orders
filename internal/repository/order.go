@@ -3,7 +3,12 @@ package repository
 import (
 	"fmt"
 	"slices"
+	"sync"
 	"top-selection-test/internal/model"
+)
+
+var (
+	mu sync.RWMutex
 )
 
 type Orders map[model.Room][]model.Order
@@ -17,8 +22,10 @@ func NewOrders() Orders {
 	return o
 }
 
-func (o Orders) Add(order model.Order) error {
-	// TODO Add mutex
+func (o Orders) Create(order model.Order) error {
+	mu.Lock()
+	defer mu.Unlock()
+
 	room := rooms.GetByName(order.HotelID, order.RoomID)
 	if room == nil {
 		return formatOrderError(ErrRoomDoesntExist, order, false)
@@ -26,11 +33,6 @@ func (o Orders) Add(order model.Order) error {
 
 	roomOrders := o[*room]
 	i, inOrders := slices.BinarySearchFunc(roomOrders, order, func(a, b model.Order) int {
-		// TODO Analyze this if
-		if a.From == b.From && a.To == b.To {
-			return 0
-		}
-
 		return a.From.Compare(b.From)
 	})
 
@@ -39,14 +41,14 @@ func (o Orders) Add(order model.Order) error {
 	}
 
 	// After binary search we have invariant:
-	// roomOrders[i-i].From < order.From < roomOrders.[i].From
+	// roomOrders[i-i].From < order.From <= roomOrders[i].From
 
 	// Check that roomOrders[i-1].To < order.From
 	if i >= 1 && roomOrders[i-1].To.After(order.From) {
 		return formatOrderError(ErrRoomNotAvailable, order, true)
 	}
 
-	// Check that roomOrders[i].From > order.To
+	// Check that roomOrders[i].From >= order.To
 	if i < len(roomOrders) && roomOrders[i].From.Before(order.To) {
 		return formatOrderError(ErrRoomNotAvailable, order, true)
 	}
