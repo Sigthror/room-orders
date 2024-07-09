@@ -1,3 +1,5 @@
+//go:build unit
+
 package repository
 
 import (
@@ -8,10 +10,15 @@ import (
 	"top-selection-test/internal/model"
 )
 
+const (
+	expectedOrderCount = 4
+)
+
 func TestOrders_Add(t *testing.T) {
 	orders := NewOrders()
 	startDate := time.Date(2024, 7, 1, 0, 0, 0, 0, &time.Location{})
 
+	// Test must be run exact this order
 	tests := []struct {
 		name  string
 		order model.Order
@@ -116,9 +123,8 @@ func TestOrders_Add(t *testing.T) {
 	}
 
 	resOrders := orders[predefinedRooms["redisson_blackhole"]]
-	expectedCount := 4
-	if len(resOrders) != expectedCount {
-		t.Fatalf("orders count mismatch: want %d got %d", expectedCount, len(resOrders))
+	if len(resOrders) != expectedOrderCount {
+		t.Fatalf("orders count mismatch: want %d got %d", expectedOrderCount, len(resOrders))
 	}
 
 	if !slices.IsSortedFunc(resOrders, func(a, b model.Order) int {

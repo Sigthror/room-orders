@@ -43,7 +43,7 @@ func (o Orders) Create(order model.Order) error {
 	// After binary search we have invariant:
 	// roomOrders[i-i].From < order.From <= roomOrders[i].From
 
-	// Check that roomOrders[i-1].To < order.From
+	// Check that roomOrders[i-1].To <= order.From
 	if i >= 1 && roomOrders[i-1].To.After(order.From) {
 		return formatOrderError(ErrRoomNotAvailable, order, true)
 	}
@@ -55,6 +55,7 @@ func (o Orders) Create(order model.Order) error {
 
 	o[*room] = slices.Insert(roomOrders, i, order)
 
+	// TODO make to logger calls
 	fmt.Printf("room boked from %s to %s\n", order.From.Format("2006/01/02"), order.To.Format("2006/01/02"))
 
 	return nil

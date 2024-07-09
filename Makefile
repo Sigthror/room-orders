@@ -16,9 +16,12 @@ build:
 
 .PHONY: start
 start:
+	@mkdir -p ./.out
 	@docker run \
 		-it \
 		--rm \
+		--detach \
+		--name ${CONTAINER_NAME} \
 		$(if $(filter true,$(DEBUG)), \
 			-p ${DEBUG_PORT}:${DEBUG_PORT} \
 			--security-opt="apparmor=unconfined" \
@@ -28,24 +31,22 @@ start:
 		-p 8080:80 \
 		${IMAGE_NAME}
 
+.PHONY: stop
+stop:
+	@docker stop \
+		${CONTAINER_NAME} \
+		1> /dev/null
+
 .PHONY: test
-test:
+test-unit:
 	go test \
-	--count=1 \
-	./...
+		--tags=unit \
+		./...
 
-.PHONY: debug
-debug: DEBUG=true
-debug:
-
-.PHONY: help
-help: ## describes all the targets in the makefile
-	@echo "Help for repository:" && echo
-	@echo "Options: (more options in Makefile.env)"
-	@grep -h -E '^[a-zA-Z0-9_-]+[[:blank:]]*[:?!+]?=.*?##' $(MAKEFILE_LIST) | \
-		sed -E 's/([^[:blank:]]+).*=[[:blank:]]*([^#]*)##(.*)/\1#-\3. Default: \2/' | sort -k1,1 | column -t -s "#"
-	@echo && echo "Commands:"
-	@grep -h -E '^[a-zA-Z_-]+:.*##' $(MAKEFILE_LIST) | sed -E 's/(.*):.*##/\1#-/' | sort -k1,1 | column -t -s "#"
-
-echo:
-	echo ${DEBUG_CMD}
+.PHONY: test
+test-integration: build start
+	@go test \
+		--count=1 \
+		--tags=integration \
+		./...
+	@$(MAKE) stop

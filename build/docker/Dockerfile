@@ -36,4 +36,6 @@ COPY --from=build /usr/local/bin/${PROJECT_NAME} /usr/local/bin/${PROJECT_NAME}
 
 RUN chmod +x /usr/local/bin/${PROJECT_NAME}
 
+EXPOSE 80
+
 ENTRYPOINT ${DEBUG_CMD} exec /usr/local/bin/${PROJECT_NAME}

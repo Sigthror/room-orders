@@ -6,7 +6,7 @@ import (
 	"os/signal"
 	"syscall"
 	"top-selection-test/internal/http"
-	"top-selection-test/internal/http/handlers"
+	v1 "top-selection-test/internal/http/handlers/v1"
 	"top-selection-test/internal/repository"
 )
 
@@ -15,7 +15,7 @@ func main() {
 	defer cancel()
 
 	orderRepository := repository.NewOrders()
-	orderHandler := handlers.NewOrders(orderRepository)
+	orderHandler := v1.NewOrders(orderRepository)
 	r := http.NewRouter(orderHandler)
 	srv := http.NewServer(http.DefaultConfig, r)
 	if err := srv.ListenAndServe(ctx); err != nil {
