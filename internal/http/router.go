@@ -2,9 +2,9 @@ package http
 
 import (
 	"net/http"
+	"top-selection-test/internal/http/middleware"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
 )
 
 type orderHandlers interface {
@@ -18,7 +18,7 @@ func NewRouter(
 
 	r.Get("/health", healthHandler)
 	r.Route("/api", func(r chi.Router) {
-		r.Use(middleware.Logger)
+		r.Use(middleware.UUID, middleware.Logger)
 		r.Route("/v1", func(r chi.Router) {
 			r.Route("/order", func(r chi.Router) {
 				r.Post("/", newEndpoint(oh.Create))

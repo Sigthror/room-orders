@@ -3,12 +3,12 @@ package http
 import (
 	"encoding/json"
 	"errors"
-	"fmt"
 	"net/http"
+	"top-selection-test/internal/logger"
 )
 
 var (
-	defaultHTTPError = errors.New("Something getting wrong. Please visit ")
+	errDefaultHTTP = errors.New("something getting wrong")
 )
 
 type ResponseError struct {
@@ -36,15 +36,14 @@ func newEndpoint(endpoint func(w http.ResponseWriter, r *http.Request) error, de
 		}
 
 		code := http.StatusInternalServerError
-		resErr := defaultHTTPError
+		resErr := errDefaultHTTP
 
 		var httpErr ResponseError
 		if errors.As(err, &httpErr) {
 			code = httpErr.Code
 			resErr = httpErr.ResponseError
 			if httpErr.VerboseErr != nil {
-				// TODO Make logger call
-				fmt.Println(httpErr.VerboseErr.Error())
+				logger.FromContext(r.Context()).Debug("%s", httpErr.VerboseErr.Error())
 			}
 		}
 

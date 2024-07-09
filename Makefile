@@ -20,8 +20,8 @@ start:
 	@docker run \
 		-it \
 		--rm \
-		--detach \
 		--name ${CONTAINER_NAME} \
+		$(if $(filter true,$(DETACH)),--detach) \
 		$(if $(filter true,$(DEBUG)), \
 			-p ${DEBUG_PORT}:${DEBUG_PORT} \
 			--security-opt="apparmor=unconfined" \
@@ -40,12 +40,14 @@ stop:
 .PHONY: test
 test-unit:
 	go test \
+		-race \
 		--tags=unit \
 		./...
 
 .PHONY: test
+test-integration: DETACH=true
 test-integration: build start
-	@go test \
+	@APP_HOST=$(APP_HOST) APP_PORT=$(APP_PORT) go test \
 		--count=1 \
 		--tags=integration \
 		./...

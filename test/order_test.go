@@ -11,10 +11,11 @@ import (
 )
 
 func TestOrder(t *testing.T) {
-	// host, err := getHostPort()
-	// if err != nil {
-	// 	t.Fatalf("failed to get host: %v", err)
-	// }
+	host, err := getHostPort()
+	if err != nil {
+		t.Fatalf("failed to get host: %v", err)
+	}
+
 	tests := []struct {
 		name   string
 		method string
@@ -47,7 +48,7 @@ func TestOrder(t *testing.T) {
 
 	url := url.URL{
 		Scheme: "http",
-		Host:   "localhost:8080",
+		Host:   host,
 		Path:   "api/v1/order",
 	}
 	for _, tt := range tests {

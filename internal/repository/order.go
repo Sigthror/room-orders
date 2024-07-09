@@ -1,7 +1,7 @@
 package repository
 
 import (
-	"fmt"
+	"context"
 	"slices"
 	"sync"
 	"top-selection-test/internal/model"
@@ -22,7 +22,7 @@ func NewOrders() Orders {
 	return o
 }
 
-func (o Orders) Create(order model.Order) error {
+func (o Orders) Create(ctx context.Context, order model.Order) error {
 	mu.Lock()
 	defer mu.Unlock()
 
@@ -54,9 +54,6 @@ func (o Orders) Create(order model.Order) error {
 	}
 
 	o[*room] = slices.Insert(roomOrders, i, order)
-
-	// TODO make to logger calls
-	fmt.Printf("room boked from %s to %s\n", order.From.Format("2006/01/02"), order.To.Format("2006/01/02"))
 
 	return nil
 }

@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -11,7 +12,7 @@ import (
 // Usually we don't use repository direct in the handlers,
 // but in current implementation abstraction between transport and DAL is not neccessary
 type OrderRepository interface {
-	Create(order model.Order) error
+	Create(ctx context.Context, order model.Order) error
 }
 
 type Orders struct {
@@ -32,13 +33,16 @@ func (h *Orders) Create(w http.ResponseWriter, r *http.Request) error {
 		return httpserver.ResponseError{
 			Code:          http.StatusBadRequest,
 			ResponseError: errors.New("invalid json format"),
+			VerboseErr:    err,
 		}
 	}
 
-	if err := h.orderRepository.Create(o); err != nil {
+	// TODO Truncate dates
+	if err := h.orderRepository.Create(r.Context(), o); err != nil {
+		// TODO Error handling for different repo errors
 		return httpserver.ResponseError{
 			Code:          http.StatusConflict,
-			ResponseError: errors.New("room is not avaliable"),
+			ResponseError: errors.New("room is not avaliable for given dates"),
 			VerboseErr:    err,
 		}
 	}

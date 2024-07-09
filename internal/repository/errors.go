@@ -7,7 +7,7 @@ import (
 )
 
 const (
-	dateLayout = "2007/01/02"
+	dateLayout = "2006/01/02"
 )
 
 var (

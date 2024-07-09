@@ -3,6 +3,7 @@
 package repository
 
 import (
+	"context"
 	"errors"
 	"slices"
 	"testing"
@@ -15,6 +16,7 @@ const (
 )
 
 func TestOrders_Add(t *testing.T) {
+	ctx := context.Background()
 	orders := NewOrders()
 	startDate := time.Date(2024, 7, 1, 0, 0, 0, 0, &time.Location{})
 
@@ -116,7 +118,7 @@ func TestOrders_Add(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if err := orders.Create(tt.order); !errors.Is(err, tt.err) {
+			if err := orders.Create(ctx, tt.order); !errors.Is(err, tt.err) {
 				t.Fatalf("%s failed: want '%s' got '%s'", tt.name, tt.err, err)
 			}
 		})

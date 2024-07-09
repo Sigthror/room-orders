@@ -41,7 +41,6 @@ func NewServer(cfg Config, r http.Handler) *Server {
 }
 
 func (s *Server) ListenAndServe(ctx context.Context) error {
-	// TODO make logger for context
 	sCtx, cancelCause := context.WithCancelCause(ctx)
 	defer cancelCause(nil)
 
