@@ -39,13 +39,18 @@ func newEndpoint(endpoint func(w http.ResponseWriter, r *http.Request) error, de
 		resErr := errDefaultHTTP
 
 		var httpErr ResponseError
+
+		// Probably overhead, try to make it simplier in the future
+		logErr := err
 		if errors.As(err, &httpErr) {
 			code = httpErr.Code
 			resErr = httpErr.ResponseError
-			if httpErr.VerboseErr != nil {
-				logger.FromContext(r.Context()).Debug("%s", httpErr.VerboseErr.Error())
+			logErr = httpErr.VerboseErr
+			if logErr == nil {
+				logErr = httpErr.ResponseError
 			}
 		}
+		logger.FromContext(r.Context()).Debug("%s", logErr)
 
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(code)
