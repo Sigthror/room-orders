@@ -33,6 +33,18 @@ func TestOrder(t *testing.T) {
 			code: http.StatusBadRequest,
 		},
 		{
+			name:   "room not found",
+			method: http.MethodPost,
+			data: model.Order{
+				HotelID:   "reddisson",
+				RoomID:    "blackhole",
+				UserEmail: "test_user@mail.com",
+				From:      time.Now(),
+				To:        time.Now().AddDate(0, 0, 3),
+			},
+			code: http.StatusNotFound,
+		},
+		{
 			name:   "success creating order",
 			method: http.MethodPost,
 			data: model.Order{
@@ -43,6 +55,18 @@ func TestOrder(t *testing.T) {
 				To:        time.Now().AddDate(0, 0, 3),
 			},
 			code: http.StatusOK,
+		},
+		{
+			name:   "conflict in dates",
+			method: http.MethodPost,
+			data: model.Order{
+				HotelID:   "redisson",
+				RoomID:    "blackhole",
+				UserEmail: "test_user@mail.com",
+				From:      time.Now(),
+				To:        time.Now().AddDate(0, 0, 3),
+			},
+			code: http.StatusConflict,
 		},
 	}
 

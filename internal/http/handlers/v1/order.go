@@ -72,8 +72,8 @@ func convertRepositoryErrorToHTTPError(err error) error {
 		}
 	case errors.Is(err, repository.ErrRoomNotAvailable):
 		rErr = httpserver.ResponseError{
-			Code:          http.StatusUnprocessableEntity,
-			ResponseError: errors.New("rrom is not available for given dates"),
+			Code:          http.StatusConflict,
+			ResponseError: errors.New("room is not available for given dates"),
 			VerboseErr:    err,
 		}
 	default:

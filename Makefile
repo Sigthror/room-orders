@@ -44,11 +44,12 @@ test-unit:
 		--tags=unit \
 		./...
 
+### TODO Need improve this command
+### Stop after unsuccessfull run
 .PHONY: test
 test-integration: DETACH=true
-test-integration: build start
+test-integration:
 	@APP_HOST=$(APP_HOST) APP_PORT=$(APP_PORT) go test \
 		--count=1 \
 		--tags=integration \
 		./...
-	@$(MAKE) stop
